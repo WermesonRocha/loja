@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import br.com.loja.entity.Client;
 import br.com.loja.entity.Salesman;
 import br.com.loja.entity.Store;
+import br.com.loja.service.ClientService;
 import br.com.loja.service.SalesmanService;
 import br.com.loja.service.StoreService;
 
@@ -20,6 +22,8 @@ public class PublicApi {
 	private StoreService storeService;
 	@Autowired
 	private SalesmanService salesmanService;
+	@Autowired
+	private ClientService clientService;
 
 	@RequestMapping(value = "/store", method = RequestMethod.POST)
 	public ResponseEntity<Store> addStore(@RequestBody Store store) {
@@ -33,6 +37,13 @@ public class PublicApi {
 		if (salesman.isValid() && storeService.getStore(salesman.getStore().getId()) != null)
 			return new ResponseEntity<Salesman>(salesmanService.addSalesman(salesman), HttpStatus.OK);
 		return new ResponseEntity<Salesman>(HttpStatus.BAD_REQUEST);
+	}
+
+	@RequestMapping(value = "/client", method = RequestMethod.POST)
+	public ResponseEntity<Client> addClient(@RequestBody Client client) {
+		if (client.isValid() && storeService.getStore(client.getStore().getId()) != null)
+			return new ResponseEntity<Client>(clientService.addClient(client), HttpStatus.OK);
+		return new ResponseEntity<Client>(HttpStatus.BAD_REQUEST);
 	}
 
 }
