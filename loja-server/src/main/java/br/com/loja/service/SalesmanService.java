@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.loja.entity.Salesman;
+import br.com.loja.entity.Store;
 import br.com.loja.repository.SalesmanRepository;
 
 @Service
@@ -38,6 +39,10 @@ public class SalesmanService {
 
 	public void deleteSalesman(int salesmanId) {
 		salesmanRepository.deleteById(salesmanId);
+	}
+
+	public List<Salesman> getSalesmansByStore(Store store) {
+		return salesmanRepository.findByStore(store);
 	}
 
 }

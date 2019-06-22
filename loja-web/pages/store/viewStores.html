@@ -1,0 +1,117 @@
+<!DOCTYPE=html>
+    <html>
+
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>Loja - VueJs</title>
+        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+        <script src="../../js/axios.min.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+            integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+            integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+    </head>
+
+    <body>
+        <div id="app">
+            <div class="card" style="margin-left: 10%;margin-top: 5%; width: 80%; height: 80%;border-width: 2px;">
+                <div class="form-group mx-sm-3 mb-2" style="margin-top: 10px;">
+                    <label for="search" class="sr-only">Buscar</label>
+                    <input type="text" class="form-control" id="search" placeholder="Entre com o nome da loja">
+                </div>
+                <div class="card-title" style="margin: 10px">
+                    <h1>Lojas Cadastradas</h1>
+                </div>
+
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Info</th>
+                            <th scope="col">Editar</th>
+                            <th scope="col">Apagar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="store in stores">
+                            <th scope="row">{{store.id}}</th>
+                            <td>{{store.name}}</td>
+                            <td><button class="btn btn-primary" v-on:click="infoStore(store.id)"><i class="fas fa-info-circle"></i></button></td>
+                            <td><button class="btn btn-warning" v-on:click="editStore()"><i class="fas fa-edit"></i></button></td>
+                            <td><button class="btn btn-danger" v-on:click="deleteStore()"><i class="fas fa-trash-alt"></i></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        </div>
+
+        <script>
+            const app = new Vue({
+                el: "#app",
+                data: {
+                    url: 'http://localhost:8080/api/public/salesman',
+                    nameSalesman: '',
+                    salarySalesman: '',
+                    stores: [],
+                    storeSelected: ''
+                },
+                created: function () {
+                    let c = this;
+                    let urlGet = 'http://localhost:8080/api/store/stores'
+                    axios.get(urlGet, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }).then(resp => {
+                        for (let i in resp.data) {
+                            c.stores.push(resp.data[i])
+                        }
+                    }).catch(error => console.log(error))
+                },
+                methods: {
+                    addSalesman() {
+                        if (this.nameSalesman !== '' && this.salarySalesman > 0 && this.storeSelected > 0) {
+                            axios.post(this.url, {
+                                name: this.nameSalesman,
+                                salary: this.salarySalesman,
+                                store: {
+                                    id: this.storeSelected
+                                }
+                            }, {
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                }).then(resp => {
+                                    alert("Vendedor adicionado com sucesso  !");
+                                    window.location.replace("../../index.html");
+                                }).catch(error => {
+                                    console.log(error);
+                                });
+                        }
+                        else
+                            alert('Preencha o formulário corretamente !');
+                    },
+                    infoStore(storeId){
+                        window.location.replace('infoStore.html?id='+storeId);
+                    },
+                    deleteStore(storeId) {
+                        alert('Delete store');
+                    }
+                }
+            })
+        </script>
+    </body>
+
+    </html>

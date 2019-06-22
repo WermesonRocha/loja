@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.loja.entity.Client;
+import br.com.loja.entity.Store;
 import br.com.loja.repository.ClientRepository;
 
 @Service
@@ -38,6 +39,14 @@ public class ClientService {
 	
 	public List<Client> getClients(){
 		return clientRepository.findAll();
+	}
+
+	public List<Client> getAllClientsByStore(Store store) {
+		return clientRepository.findByStore(store);
+	}
+
+	public List<Client> getAllClientsByStoreAndSeach(Store store, String search) {
+		return clientRepository.searchByStoreAndSearch(store, search);
 	}
 
 }

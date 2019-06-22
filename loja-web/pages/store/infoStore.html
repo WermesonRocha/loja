@@ -1,0 +1,154 @@
+<!DOCTYPE=html>
+    <html>
+
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>Loja - VueJs</title>
+        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+        <script src="../../js/axios.min.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+            integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+            integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+    </head>
+
+    <body>
+        <div id="app">
+            <div class="card" style="margin-left: 10%;margin-top: 5%; width: 80%; height: 80%;border-width: 2px;">
+                <div class="form-group mx-sm-3 mb-2" style="margin-top: 10px;">
+                    <label for="search" class="sr-only">Buscar</label>
+                    <input type="text" class="form-control" id="search" placeholder="Buscar vendedor ou cliente"
+                        v-on:keyup="funcParouDigitar()" v-on:keydown="funcDigitou()" ref="search">
+                </div>
+                <div class="card-title" style="margin: 10px">
+                    <h2>{{nameStore}}</h2>
+                </div>
+                <div class="card-subtitle" style="margin: 10px">
+                    <h3>Clientes</h3>
+                </div>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Idade</th>
+                            <th scope="col">Sexo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="client in clients">
+                            <th scope="row">{{client.clientId}}</th>
+                            <td>{{client.name}}</td>
+                            <td>{{client.age}}</td>
+                            <td>{{client.sex}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="card-subtitle" style="margin: 10px">
+                    <h3>Vendedores</h3>
+                </div>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Salário ($)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="salesman in salesmans">
+                            <th scope="row">{{salesman.salesmanId}}</th>
+                            <td>{{salesman.name}}</td>
+                            <td>{{salesman.salary}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        </div>
+
+        <script>
+            const app = new Vue({
+                el: "#app",
+                data: {
+                    url: 'http://localhost:8080/api/store',
+                    nameStore: '',
+                    clients: [],
+                    salesmans: [],
+                    tempoEscrevendo: '',            //identificador de tempo
+                    tempoSemEscrever: 1000        //tempo em ms, 1 segundo por exemplo
+
+                },
+                created: function () {
+                    let currentUrl = window.location.href;
+                    let id = new URL(currentUrl).searchParams.get("id");
+                    let contexto = this;
+                    axios.get(this.url + '/' + id, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }).then(resp => contexto.nameStore = resp.data.name).catch();
+                    axios.get(this.url + '/client/' + id, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }).then(resp => {
+                        for (let c in resp.data) {
+                            contexto.clients.push(resp.data[c]);
+                        }
+                    }).catch();
+                    axios.get(this.url + '/salesman/' + id, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }).then(resp => {
+                        for (let c in resp.data) {
+                            contexto.salesmans.push(resp.data[c]);
+                        }
+                    }).catch();
+                },
+                methods: {
+                    funcParouDigitar() {
+                        clearTimeout(this.tempoEscrevendo);
+                        this.tempoEscrevendo = setTimeout(this.search, this.tempoSemEscrever);
+                    },
+                    funcDigitou() {
+                        clearTimeout(this.tempoEscrevendo);
+                    },
+                    search() {
+                        let context = this;
+                        let text = context.$refs.search;
+                        if (text.value.length > 3) {
+                            let currentUrl = window.location.href;
+                            let id = new URL(currentUrl).searchParams.get("id");
+                            let url = 'http://localhost:8080/api/store/client/' + id + '/' + search
+                            axios.get(url, {
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            }).then(resp => {
+                                context.clients = []
+                                console.log(resp.data)
+                                for (let c in resp.data) {
+                                    context.clients.push(resp.data[c]);
+                                }
+                            }).catch();
+                        }
+                        
+                    }
+                }
+            })
+        </script>
+    </body>
+
+    </html>
