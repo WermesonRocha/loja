@@ -29,7 +29,7 @@ public class Store {
 	}
 
 	public boolean isValid() {
-		if(this.getName() != null && !this.getName().equals(""))
+		if (this.getName() != null && !this.getName().equals(""))
 			return true;
 		return false;
 	}
